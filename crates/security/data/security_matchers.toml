@@ -1597,6 +1597,177 @@ arg_index = 0
 requires_source = true
 evidence_template = "Untrusted input reaches the prompt/messages of {callee}() (an LLM call). Candidate for verification: confirm attacker-controlled input cannot inject instructions into the prompt (prompt injection); validate / fence the untrusted segment before it reaches the model."
 
+# ── CWE-1427: Agent tool misuse / dangerous function calling ──────────────────
+# An agent executes a tool/function with untrusted input controlling the tool
+# selection or arguments. This covers cases where attacker input reaches the
+# tool name or tool arguments in agent frameworks (Vercel AI SDK tools,
+# OpenAI function calling, Anthropic tool use, LangChain tools).
+# The taint gate ensures only source-backed calls fire.
+[[matcher]]
+id = "agent-tool-misuse"
+cwe = 1427
+title = "Untrusted input controls agent tool call"
+effect = "process"
+sink_shape = "member-call"
+callee_patterns = [
+  # Vercel AI SDK tool calling
+  "*.tools.*",
+  # OpenAI function calling via responses API
+  "*.responses.create",
+  # Anthropic tool use
+  "*.messages.create",
+  # Generic agent tool execution patterns
+  "*.executeTool",
+  "*.callTool",
+  "*.invokeTool",
+]
+arg_index = 0
+requires_source = true
+evidence_template = "Untrusted input reaches tool/function arguments in {callee}(). Candidate for verification: confirm tool selection and arguments are not attacker-controlled (agent hijacking / tool misuse). Validate / sanitize inputs before passing to tool execution."
+
+# ── CWE-201: LLM data exfiltration (secrets/PII to model) ─────────────────────
+# Secrets, PII, or sensitive data reaching LLM prompt/messages arguments.
+# Distinct from llm-call-injection: this focuses on data sensitivity rather than
+# prompt injection semantics. The taint gate ensures only source-backed flows fire.
+[[matcher]]
+id = "llm-data-exfiltration"
+cwe = 201
+title = "Secret or PII reaches LLM call"
+effect = "network"
+sink_shape = "member-call"
+callee_patterns = [
+  # OpenAI SDK
+  "*.chat.completions.create",
+  "*.completions.create",
+  "*.responses.create",
+  # Anthropic SDK
+  "*.messages.create",
+  # Google GenAI SDK
+  "*.generateContent",
+  "*.generateContentStream",
+  # Vercel AI SDK
+  "generateText", "streamText", "generateObject", "streamObject",
+]
+arg_index = 0
+requires_source = true
+requires_source_kinds = ["process-env", "import-meta-env", "http-request-input", "webhook-raw-body"]
+evidence_template = "A secret or PII value reaches the prompt/messages of {callee}() (an LLM call). Candidate for verification: confirm sensitive data is not sent to the model provider (data exfiltration); redact or fence secrets before calling the LLM."
+
+# ── CWE-1336: RAG poisoning (untrusted data in retrieval context) ─────────────
+# Untrusted/attacker-controlled data injected into RAG retrieval context that
+# reaches the LLM. This covers vector store writes with untrusted content,
+# document ingestion pipelines, and context assembly with unverified sources.
+[[matcher]]
+id = "rag-poisoning"
+cwe = 1336
+title = "Untrusted data in RAG retrieval context"
+effect = "process"
+sink_shape = "member-call"
+callee_patterns = [
+  # Vector store writes
+  "*.upsert", "*.insert", "*.add", "*.create",
+  # Embedding generation with untrusted input
+  "*.embed", "*.embeddings.create",
+  # Context assembly
+  "*.retrieve", "*.query", "*.search",
+]
+arg_index = 0
+requires_source = true
+evidence_template = "Untrusted input reaches RAG retrieval/context in {callee}(). Candidate for verification: confirm retrieved content cannot be poisoned by attacker-controlled data (RAG poisoning); validate and sanitize documents before indexing."
+
+# ── CWE-922: Insecure agent state / memory handling ───────────────────────────
+# Agent memory/state writes with untrusted input that can affect future agent
+# behavior. Covers conversation history manipulation, agent memory stores,
+# and persistent state that influences subsequent LLM calls.
+[[matcher]]
+id = "insecure-agent-state"
+cwe = 922
+title = "Untrusted input writes agent state/memory"
+effect = "write"
+sink_shape = "member-call"
+callee_patterns = [
+  # Memory/storage writes
+  "*.memory.add", "*.memory.set", "*.memory.update",
+  "*.state.set", "*.state.update", "*.context.set",
+  "*.history.add", "*.history.push",
+  # Conversation management
+  "*.conversation.add", "*.messages.add",
+]
+arg_index = 0
+requires_source = true
+evidence_template = "Untrusted input writes agent state/memory via {callee}(). Candidate for verification: confirm attacker cannot manipulate agent memory to influence future behavior (agent state poisoning); validate inputs before persisting to agent state."
+
+# ── CWE-94: MCP tool injection (untrusted input to MCP tool calls) ────────────
+# Model Context Protocol (MCP) tool calls with untrusted input controlling
+# the tool name or arguments. MCP tools execute with the permissions of the
+# MCP server, making injection particularly dangerous.
+[[matcher]]
+id = "mcp-tool-injection"
+cwe = 94
+title = "Untrusted input reaches MCP tool call"
+effect = "process"
+sink_shape = "call"
+callee_patterns = [
+  "mcp.call", "mcp.callTool", "mcp.invoke",
+  "*.callTool", "*.invokeTool",
+]
+arg_index = 0
+requires_source = true
+evidence_template = "Untrusted input reaches MCP tool call {callee}(). Candidate for verification: confirm tool name and arguments are not attacker-controlled (MCP tool injection); validate tool selection and sanitize arguments before invocation."
+
+# Vercel AI SDK tool calling - member call form
+[[matcher]]
+id = "mcp-tool-injection"
+cwe = 94
+title = "Untrusted input reaches MCP tool call"
+effect = "process"
+sink_shape = "member-call"
+callee_patterns = [
+  "*.callTool", "*.invokeTool", "*.executeTool",
+]
+arg_index = 0
+requires_source = true
+evidence_template = "Untrusted input reaches MCP tool call {callee}(). Candidate for verification: confirm tool name and arguments are not attacker-controlled (MCP tool injection); validate tool selection and sanitize arguments before invocation."
+
+# ── CWE-1427: LLM system prompt override ──────────────────────────────────────
+# Attacker input reaches the system prompt / system message of an LLM call,
+# allowing prompt injection at the system level which has higher authority.
+[[matcher]]
+id = "llm-system-prompt-override"
+cwe = 1427
+title = "Untrusted input reaches LLM system prompt"
+effect = "network"
+sink_shape = "member-call"
+callee_patterns = [
+  "*.chat.completions.create",
+  "*.messages.create",
+  "*.generateContent",
+]
+arg_index = 0
+requires_source = true
+literal_contains = ["system"]
+evidence_template = "Untrusted input reaches the system prompt of {callee}(). Candidate for verification: system prompt injection has elevated impact; confirm attacker-controlled input cannot override system instructions."
+
+# ── CWE-1427: Agent output parsing injection ──────────────────────────────────
+# Untrusted LLM output parsed as structured data (JSON, function calls) without
+# validation, leading to injection in downstream processing.
+[[matcher]]
+id = "agent-output-parsing-injection"
+cwe = 1427
+title = "Unvalidated LLM output parsed as structured data"
+effect = "process"
+sink_shape = "member-call"
+callee_patterns = [
+  "JSON.parse",
+  "*.parse",
+  "*.parseJSON",
+  "zod.parse",
+  "*.safeParse",
+]
+arg_index = 0
+requires_source = false
+evidence_template = "LLM output parsed by {callee}() without validation. Candidate for verification: confirm LLM output is validated before parsing (output parsing injection); use schema validation (zod, valibot) and handle parse failures safely."
+
 # DEFERRED (needs structural capture or a tighter predicate):
 #   - ReDoS: risky regex LITERAL structure (nested quantifiers); RegExpLiteral is
 #     a literal and never captured. Needs a regex-structural capture hook.

@@ -1,0 +1,40 @@
+[package]
+name = "fallow-security-ai"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "AI-powered security finding verification for fallow"
+readme = "../../README.md"
+
+[lib]
+doctest = false
+
+[dependencies]
+fallow-types = { workspace = true }
+fallow-output = { workspace = true }
+fallow-security = { workspace = true }
+fallow-config = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = "1"
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "sync", "time"] }
+reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
+async-trait = "0.1"
+sha2 = { workspace = true }
+hex = "0.4"
+once_cell = "1"
+chrono = { version = "0.4", features = ["serde"] }
+regex = "1"
+
+[dev-dependencies]
+tempfile = { workspace = true }
+mockito = "1"
+
+[lints]
+workspace = true
