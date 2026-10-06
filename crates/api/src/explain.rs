@@ -1352,6 +1352,41 @@ pub const SECURITY_RULES: &[RuleDef] = &[
         "Untrusted input reaches an LLM call",
         "1427"
     ),
+    security_catalogue_rule!(
+        "agent-tool-misuse",
+        "Untrusted input controls agent tool call",
+        "1427"
+    ),
+    security_catalogue_rule!(
+        "llm-data-exfiltration",
+        "Secret or PII reaches LLM call",
+        "201"
+    ),
+    security_catalogue_rule!(
+        "rag-poisoning",
+        "Untrusted data in RAG retrieval context",
+        "1336"
+    ),
+    security_catalogue_rule!(
+        "insecure-agent-state",
+        "Untrusted input writes agent state/memory",
+        "922"
+    ),
+    security_catalogue_rule!(
+        "mcp-tool-injection",
+        "Untrusted input reaches MCP tool call",
+        "94"
+    ),
+    security_catalogue_rule!(
+        "llm-system-prompt-override",
+        "Untrusted input reaches LLM system prompt",
+        "1427"
+    ),
+    security_catalogue_rule!(
+        "agent-output-parsing-injection",
+        "Unvalidated LLM output parsed as structured data",
+        "1427"
+    ),
 ];
 
 /// Build the `_meta` object for `fallow security --format json --explain`.

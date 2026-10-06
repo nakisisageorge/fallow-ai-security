@@ -239,10 +239,10 @@ mod tests {
     
     #[test]
     fn test_redact_secrets() {
-        let input = "const api_key = 'sk-123...cdef';";
+        let input = "const api_key = 'sk-1234567890abcdef1234';";
         let output = redact_secrets(input);
         assert!(output.contains("[REDACTED]"));
-        assert!(!output.contains("sk-123...cdef"));
+        assert!(!output.contains("sk-1234567890abcdef1234"));
     }
     
     #[test]

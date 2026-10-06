@@ -152,8 +152,10 @@ The workspace follows the ownership boundaries in
 | `crates/multicall/` | Unpublished binary crate bundling the CLI, LSP, and MCP servers into the single `fallow` binary shipped by the npm platform packages. |
 | `crates/napi/` | NAPI adapter and Node.js bindings over the workspace Rust facade. |
 | `crates/license/` | Offline signed-license verification used by licensed CLI capabilities. |
-| `crates/v8-coverage/` | V8 coverage parsing and source-offset mapping. |
-| `crates/benchmarks/` | CodSpeed and Criterion benchmark suites for the Rust workspace. |
+|| `crates/security-ai/` | AI-powered security finding verification framework. ||
+|| `crates/v8-coverage/` | V8 coverage parsing and source-offset mapping. ||
+|| `crates/compliance/` | Compliance report generator for security findings (OWASP, CWE, SOC2, ISO 27001). ||
+|| `crates/benchmarks/` | CodSpeed and Criterion benchmark suites for the Rust workspace. ||
 | `editors/vscode/` | VS Code extension and generated TypeScript contract consumer. |
 | `editors/zed/` | Zed extension. |
 | `editors/nvim/` | Neovim integration documentation. |

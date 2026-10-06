@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  fallow:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/workspace
+      - ~/.cache/fallow:/root/.cache/fallow
+    working_dir: /workspace
+    environment:
+      - FALLOW_AI_API_KEY=${FALLOW_AI_API_KEY}
+      - FALLOW_AI_ENDPOINT=${FALLOW_AI_ENDPOINT}
+    command: ["fallow", "security", "--format", "json"]
+    # For interactive use:
+    # command: ["tail", "-f", "/dev/null"]
+
+  fallow-compliance:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace
+    command: ["fallow-compliance", "--input", "security-findings.json", "--report-type", "owasp"]
+    depends_on:
+      - fallow

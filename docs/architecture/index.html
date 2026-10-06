@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fallow-ai-security — Interactive Architecture Explorer</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0d1117;
+            color: #e6edf3;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #58a6ff; margin-bottom: 8px; }
+        .subtitle { color: #8b949e; margin-bottom: 24px; }
+        .controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        button {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #e6edf3;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        button:hover { background: #30363d; border-color: #58a6ff; }
+        button.active { background: #1f6feb; border-color: #58a6ff; }
+        .tree-container { background: #161b22; border: 1px solid #30363d; border-radius: 8px; overflow: hidden; }
+        .tree { padding: 20px; }
+        .node { margin-left: 24px; }
+        .node:first-child { margin-left: 0; }
+        .node-header { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 4px; cursor: pointer; user-select: none; transition: background 0.15s; }
+        .node-header:hover { background: #21262d; }
+        .node-header.expanded .toggle::before { content: '▼'; }
+        .toggle { font-size: 12px; color: #8b949e; width: 16px; text-align: center; }
+        .toggle::before { content: '▶'; display: inline-block; transition: transform 0.2s; }
+        .node-label { flex: 1; font-weight: 500; }
+        .node-badge { font-size: 11px; padding: 2px 6px; border-radius: 3px; background: #21262d; color: #8b949e; }
+        .node-badge.new { background: #3d1a00; color: #f97583; border: 1px solid #f97583; }
+        .node-badge.compliance { background: #0d2d4a; color: #79c0ff; border: 1px solid #79c0ff; }
+        .node-badge.ai { background: #1a1a2e; color: #a5d6ff; border: 1px solid #a5d6ff; }
+        .node-children { display: none; padding-left: 16px; border-left: 1px solid #30363d; margin-left: 8px; }
+        .node-children.visible { display: block; }
+        .leaf { display: flex; align-items: center; gap: 8px; padding: 6px 10px; margin-left: 24px; color: #8b949e; font-size: 14px; }
+        .leaf .icon { color: #58a6ff; }
+        .legend { display: flex; gap: 16px; margin-top: 20px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #8b949e; }
+        .legend-color { width: 12px; height: 12px; border-radius: 3px; }
+        .search-box { width: 100%; max-width: 400px; padding: 10px 14px; background: #161b22; border: 1px solid #30363d; border-radius: 6px; color: #e6edf3; font-size: 14px; margin-bottom: 16px; }
+        .search-box:focus { outline: none; border-color: #58a6ff; }
+        .hidden { display: none !important; }
+        .node-header.match { background: rgba(88, 166, 255, 0.15); }
+        .stats { display: flex; gap: 24px; margin-bottom: 20px; flex-wrap: wrap; }
+        .stat { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px 24px; }
+        .stat-value { font-size: 28px; font-weight: 700; color: #58a6ff; }
+        .stat-label { font-size: 13px; color: #8b949e; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>fallow-ai-security</h1>
+        <p class="subtitle">Interactive Architecture Explorer — AI-Enhanced Security Analysis for TypeScript/JavaScript</p>
+
+        <div class="stats">
+            <div class="stat"><div class="stat-value">56</div><div class="stat-label">Security Categories</div></div>
+            <div class="stat"><div class="stat-value">8</div><div class="stat-label">AI/LLM Rules</div></div>
+            <div class="stat"><div class="stat-value">4</div><div class="stat-label">Compliance Frameworks</div></div>
+            <div class="stat"><div class="stat-value">3</div><div class="stat-label">New Crates</div></div>
+        </div>
+
+        <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search architecture (e.g., 'prompt', 'compliance', 'verification')...">
+
+        <div class="controls">
+            <button id="expandAll" onclick="expandAll()">Expand All</button>
+            <button id="collapseAll" onclick="collapseAll()">Collapse All</button>
+            <button onclick="filterBy('all')" class="active" data-filter="all">All</button>
+            <button onclick="filterBy('security')" data-filter="security">Security</button>
+            <button onclick="filterBy('compliance')" data-filter="compliance">Compliance</button>
+            <button onclick="filterBy('ai')" data-filter="ai">AI Verification</button>
+            <button onclick="filterBy('cli')" data-filter="cli">CLI</button>
+        </div>
+
+        <div class="tree-container">
+            <div class="tree" id="tree"></div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item"><div class="legend-color" style="background:#f97583;border-color:#f97583"></div> New AI/LLM Rules</div>
+            <div class="legend-item"><div class="legend-color" style="background:#79c0ff;border-color:#79c0ff"></div> Compliance</div>
+            <div class="legend-item"><div class="legend-color" style="background:#a5d6ff;border-color:#a5d6ff"></div> AI Verification</div>
+            <div class="legend-item"><div class="legend-color" style="background:#58a6ff;border-color:#58a6ff"></div> Core Components</div>
+        </div>
+    </div>
+
+    <script>
+        const architecture = {
+            label: "fallow-ai-security",
+            type: "root",
+            children: [
+                {
+                    label: "CLI Commands",
+                    type: "cli",
+                    children: [
+                        { label: "fallow security", description: "Security analysis with 56 categories (incl. 8 AI/LLM)", type: "cli" },
+                        { label: "fallow-compliance", description: "Generate OWASP, CWE, SOC2, ISO 27001 reports", type: "compliance" },
+                        { label: "fallow ai-verify", description: "AI-assisted finding verification (opt-in)", type: "ai" },
+                        { label: "fallow health / dupes / dead-code", description: "Core fallow analysis commands", type: "cli" }
+                    ]
+                },
+                {
+                    label: "Security Analysis Engine",
+                    type: "security",
+                    children: [
+                        {
+                            label: "Traditional Categories (48)",
+                            type: "security",
+                            children: [
+                                { label: "CWE-79: XSS / HTML Sinks", type: "security" },
+                                { label: "CWE-89: SQL Injection", type: "security" },
+                                { label: "CWE-78: Command Injection", type: "security" },
+                                { label: "CWE-918: SSRF", type: "security" },
+                                { label: "CWE-22: Path Traversal", type: "security" },
+                                { label: "CWE-611: XXE", type: "security" },
+                                { label: "CWE-1321: Prototype Pollution", type: "security" },
+                                { label: "CWE-327: Weak Crypto", type: "security" },
+                                { label: "CWE-338: Insecure Randomness", type: "security" },
+                                { label: "CWE-347: JWT Issues", type: "security" },
+                                { label: "CWE-502: Unsafe Deserialization", type: "security" },
+                                { label: "CWE-1336: SSTI", type: "security" },
+                                { label: "CWE-943: NoSQL Injection", type: "security" },
+                                { label: "CWE-22: Zip Slip", type: "security" },
+                                { label: "...and 34 more", type: "security" }
+                            ]
+                        },
+                        {
+                            label: "AI/LLM Categories (8 NEW)",
+                            type: "ai",
+                            badge: "new",
+                            children: [
+                                { label: "llm-call-injection (CWE-1427)", description: "Untrusted input → LLM prompt", type: "ai" },
+                                { label: "agent-tool-misuse (CWE-1427)", description: "Untrusted input → tool calling", type: "ai" },
+                                { label: "llm-data-exfiltration (CWE-201)", description: "Secrets/PII → LLM calls", type: "ai" },
+                                { label: "rag-poisoning (CWE-1336)", description: "Untrusted data → RAG context", type: "ai" },
+                                { label: "insecure-agent-state (CWE-922)", description: "Untrusted input → agent memory", type: "ai" },
+                                { label: "mcp-tool-injection (CWE-94)", description: "Untrusted input → MCP tools", type: "ai" },
+                                { label: "llm-system-prompt-override (CWE-1427)", description: "Attacker input → system prompt", type: "ai" },
+                                { label: "agent-output-parsing-injection (CWE-1427)", description: "Unvalidated LLM output → parser", type: "ai" }
+                            ]
+                        },
+                        {
+                            label: "Source Model",
+                            type: "security",
+                            children: [
+                                { label: "HTTP Request Input (req.query/params/body)", type: "security" },
+                                { label: "Process Env / Import Meta Env", type: "security" },
+                                { label: "Framework Handler Input (Express, Fastify, Hono, Next.js)", type: "security" },
+                                { label: "MCP Tool Input", type: "security" },
+                                { label: "GraphQL Resolver Args", type: "security" },
+                                { label: "tRPC Procedure Input", type: "security" },
+                                { label: "Browser Location / DOM Sources", type: "security" }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    label: "Compliance Reporting",
+                    type: "compliance",
+                    badge: "compliance",
+                    children: [
+                        { label: "OWASP Top 10 2021", description: "A01, A03, A04, A05, A10 mappings", type: "compliance" },
+                        { label: "CWE Top 25", description: "Official CWE titles with rankings", type: "compliance" },
+                        { label: "SOC 2", description: "CC6.1, CC6.7, CC7.1 criteria", type: "compliance" },
+                        { label: "ISO 27001", description: "A.8.2, A.9.1, A.12.2, A.12.4, A.13.1, A.14.2", type: "compliance" },
+                        { label: "Output Formats", description: "Markdown (human) + JSON (machine)", type: "compliance" }
+                    ]
+                },
+                {
+                    label: "AI Verification Framework",
+                    type: "ai",
+                    badge: "ai",
+                    children: [
+                        {
+                            label: "Provider Abstraction",
+                            type: "ai",
+                            children: [
+                                { label: "OpenAI (chat.completions, responses)", type: "ai" },
+                                { label: "Anthropic (messages.create)", type: "ai" },
+                                { label: "Ollama (local models)", type: "ai" },
+                                { label: "Custom Endpoint", type: "ai" }
+                            ]
+                        },
+                        {
+                            label: "Two-Tier Caching",
+                            type: "ai",
+                            children: [
+                                { label: "Memory Cache (LRU, configurable size)", type: "ai" },
+                                { label: "Disk Cache (JSON + bitcode, content-hash keys)", type: "ai" }
+                            ]
+                        },
+                        {
+                            label: "Secret Redaction",
+                            type: "ai",
+                            children: [
+                                { label: "API Keys (sk-, ghp_, ghf_, etc.)", type: "ai" },
+                                { label: "Bearer Tokens / Authorization Headers", type: "ai" },
+                                { label: "Password / Secret / Credential Patterns", type: "ai" },
+                                { label: "Base64-like Strings (40+ chars)", type: "ai" }
+                            ]
+                        },
+                        {
+                            label: "Verification Output",
+                            type: "ai",
+                            children: [
+                                { label: "Classification: true_positive / false_positive / uncertain", type: "ai" },
+                                { label: "Confidence Score (0-100)", type: "ai" },
+                                { label: "Remediation Guidance", type: "ai" },
+                                { label: "Reasoning / Explanation", type: "ai" }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    label: "Crate Architecture",
+                    type: "core",
+                    children: [
+                        { label: "fallow-types — Shared contracts", type: "core" },
+                        { label: "fallow-config — Configuration", type: "core" },
+                        { label: "fallow-process — Process lifecycle", type: "core" },
+                        { label: "fallow-extract — Parser facts", type: "core" },
+                        { label: "fallow-graph — Module graph", type: "core" },
+                        { label: "fallow-security — Matcher catalogue (extended)", type: "security" },
+                        { label: "fallow-core — Detector backend", type: "core" },
+                        { label: "fallow-engine — Orchestration", type: "core" },
+                        { label: "fallow-output — Formatters, SARIF", type: "core" },
+                        { label: "fallow-api — Programmatic facade", type: "core" },
+                        { label: "fallow-cli — Terminal interface", type: "cli" },
+                        { label: "fallow-lsp — LSP adapter", type: "core" },
+                        { label: "fallow-mcp — MCP adapter", type: "core" },
+                        { label: "fallow-napi — Node.js bindings", type: "core" },
+                        { label: "fallow-security-ai — AI verification (NEW)", type: "ai", badge: "new" },
+                        { label: "fallow-compliance — Compliance reports (NEW)", type: "compliance", badge: "compliance" },
+                        { label: "fallow-license — License verification", type: "core" },
+                        { label: "fallow-v8-coverage — V8 coverage", type: "core" }
+                    ]
+                },
+                {
+                    label: "Data Flow",
+                    type: "flow",
+                    children: [
+                        { label: "1. Source Code → Oxc Parse → Module Graph", type: "flow" },
+                        { label: "2. Module Graph → Security Analyzer → Sink Candidates", type: "flow" },
+                        { label: "3. Sink Candidates → Source Model → Taint-Enriched Findings", type: "flow" },
+                        { label: "4. Findings (JSON) → Compliance Reporter → Framework Reports", type: "flow" },
+                        { label: "5. Findings (JSON) → AI Verifier → Verified Findings", type: "flow" }
+                    ]
+                }
+            ]
+        };
+
+        let currentFilter = 'all';
+
+        function renderTree(node, container, depth = 0) {
+            const nodeEl = document.createElement('div');
+            nodeEl.className = 'node';
+            nodeEl.dataset.type = node.type;
+
+            if (node.children && node.children.length > 0) {
+                const header = document.createElement('div');
+                header.className = 'node-header';
+                header.innerHTML = `
+                    <span class="toggle"></span>
+                    <span class="node-label">${escapeHtml(node.label)}</span>
+                    ${node.badge ? `<span class="node-badge ${node.badge}">${node.badge.toUpperCase()}</span>` : ''}
+                `;
+                header.onclick = (e) => {
+                    if (e.target === header || e.target.classList.contains('node-label') || e.target.classList.contains('toggle')) {
+                        header.classList.toggle('expanded');
+                        childrenEl.classList.toggle('visible');
+                    }
+                };
+
+                const childrenEl = document.createElement('div');
+                childrenEl.className = 'node-children';
+                node.children.forEach(child => renderTree(child, childrenEl, depth + 1));
+
+                nodeEl.appendChild(header);
+                nodeEl.appendChild(childrenEl);
+            } else {
+                const leaf = document.createElement('div');
+                leaf.className = 'leaf';
+                leaf.dataset.type = node.type;
+                const desc = node.description ? `<span style="color:#58a6ff;font-size:12px;">${escapeHtml(node.description)}</span>` : '';
+                leaf.innerHTML = `<span class="icon">◆</span><span>${escapeHtml(node.label)}</span>${desc}`;
+                nodeEl.appendChild(leaf);
+            }
+
+            container.appendChild(nodeEl);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function expandAll() {
+            document.querySelectorAll('.node-header').forEach(h => {
+                h.classList.add('expanded');
+                h.nextElementSibling?.classList.add('visible');
+            });
+        }
+
+        function collapseAll() {
+            document.querySelectorAll('.node-header').forEach(h => {
+                h.classList.remove('expanded');
+                h.nextElementSibling?.classList.remove('visible');
+            });
+        }
+
+        function filterBy(type) {
+            currentFilter = type;
+            document.querySelectorAll('.controls button[data-filter]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === type);
+            });
+            applyFilter();
+        }
+
+        function applyFilter() {
+            const nodes = document.querySelectorAll('.node, .leaf');
+            nodes.forEach(node => {
+                if (currentFilter === 'all' || node.dataset.type === currentFilter || node.dataset.type === 'root' || node.dataset.type === 'flow') {
+                    node.classList.remove('hidden');
+                } else {
+                    node.classList.add('hidden');
+                }
+            });
+        }
+
+        function searchFilter(query) {
+            const lowerQuery = query.toLowerCase();
+            const allElements = document.querySelectorAll('.node-header, .leaf');
+
+            allElements.forEach(el => {
+                const text = el.textContent.toLowerCase();
+                const parent = el.closest('.node');
+                if (text.includes(lowerQuery)) {
+                    el.classList.add('match');
+                    // Expand all parents
+                    let p = parent;
+                    while (p) {
+                        const header = p.querySelector('.node-header');
+                        const children = p.querySelector('.node-children');
+                        if (header) header.classList.add('expanded');
+                        if (children) children.classList.add('visible');
+                        p = p.parentElement?.closest('.node');
+                    }
+                } else {
+                    el.classList.remove('match');
+                }
+            });
+
+            if (!query) {
+                allElements.forEach(el => el.classList.remove('match'));
+            }
+        }
+
+        // Initialize
+        renderTree(architecture, document.getElementById('tree'));
+
+        document.getElementById('searchBox').addEventListener('input', (e) => {
+            searchFilter(e.target.value);
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement !== document.getElementById('searchBox')) {
+                e.preventDefault();
+                document.getElementById('searchBox').focus();
+            }
+            if (e.key === 'Escape') {
+                document.getElementById('searchBox').blur();
+                document.getElementById('searchBox').value = '';
+                searchFilter('');
+            }
+        });
+    </script>
+</body>
+</html>
