@@ -486,7 +486,7 @@ version = "4.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f9c751b79415d4e559e3d1fcf128e09e720eb673a06d26cf6f392d37d75b66e0"
 dependencies = [
- "heck 0.5.0",
+ "heck",
  "proc-macro2",
  "quote",
  "syn 3.0.6",
@@ -1985,12 +1985,6 @@ dependencies = [
  "equivalent",
  "foldhash",
 ]
-
-[[package]]
-name = "heck"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "95505c38b4572b2d910cecb0281560f54b440a19336cbbcb27bf6ce6adc6f5a8"
 
 [[package]]
 name = "heck"
@@ -3617,13 +3611,13 @@ dependencies = [
 
 [[package]]
 name = "papergrid"
-version = "0.12.0"
+version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7419ad52a7de9b60d33e11085a0fe3df1fbd5926aa3f93d3dd53afbc9e86725"
+checksum = "d0984e668274d34691bc2b262ef0d115de5fa9973bcdee7ae32213f93099153e"
 dependencies = [
  "bytecount",
  "fnv",
- "unicode-width 0.1.11",
+ "unicode-width 0.2.2",
 ]
 
 [[package]]
@@ -3930,30 +3924,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e67ba7e9b2b56446f1d419b1d807906278ffa1a658a8a5d8a39dcb1f5a78614f"
 dependencies = [
  "toml_edit",
-]
-
-[[package]]
-name = "proc-macro-error"
-version = "1.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da25490ff9892aab3fcf7c36f08cfb902dd3e71ca0f9f9517bea02a73a5ce38c"
-dependencies = [
- "proc-macro-error-attr",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
- "version_check",
-]
-
-[[package]]
-name = "proc-macro-error-attr"
-version = "1.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1be40180e52ecc98ad80b184934baf3d0d29f979574e439af5a55274b35f869"
-dependencies = [
- "proc-macro2",
- "quote",
- "version_check",
 ]
 
 [[package]]
@@ -4946,7 +4916,7 @@ version = "0.28.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ab85eea0270ee17587ed4156089e10b9e6880ee688791d45a905f5b1ca36f664"
 dependencies = [
- "heck 0.5.0",
+ "heck",
  "proc-macro2",
  "quote",
  "syn 2.0.119",
@@ -5055,25 +5025,25 @@ dependencies = [
 
 [[package]]
 name = "tabled"
-version = "0.16.0"
+version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77c9303ee60b9bedf722012ea29ae3711ba13a67c9b9ae28993838b63057cb1b"
+checksum = "2d2596a104db1900b943f97d793a6c99addca918c4525c999f751a0f17d472eb"
 dependencies = [
  "papergrid",
  "tabled_derive",
+ "testing_table",
 ]
 
 [[package]]
 name = "tabled_derive"
-version = "0.8.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf0fb8bfdc709786c154e24a66777493fb63ae97e3036d914c8666774c477069"
+checksum = "7dca1937322a1e892b1a65f6a6736183bb0a29d3b4234d1d53bc436dff9beb76"
 dependencies = [
- "heck 0.4.1",
- "proc-macro-error",
+ "heck",
  "proc-macro2",
  "quote",
- "syn 1.0.109",
+ "syn 2.0.119",
 ]
 
 [[package]]
@@ -5097,6 +5067,15 @@ checksum = "230a1b821ccbd75b185820a1f1ff7b14d21da1e442e22c0863ea5f08771a8874"
 dependencies = [
  "rustix",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "testing_table"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0f8daae29995a24f65619e19d8d31dea5b389f3d853d8bf297bbf607cd0014cc"
+dependencies = [
+ "unicode-width 0.2.2",
 ]
 
 [[package]]
