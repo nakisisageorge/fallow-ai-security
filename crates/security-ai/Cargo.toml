@@ -22,7 +22,7 @@ fallow-security = { workspace = true }
 fallow-config = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
-thiserror = "1"
+thiserror = "2"
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "sync", "time"] }
 reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
 async-trait = "0.1"
