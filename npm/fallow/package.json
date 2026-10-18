@@ -89,7 +89,7 @@
     "@tanstack/intent": "0.5.3"
   },
   "optionalDependencies": {
-    "@fallow-cli/darwin-arm64": "3.31.0",
+    "@fallow-cli/darwin-arm64": "3.33.1",
     "@fallow-cli/darwin-x64": "3.31.0",
     "@fallow-cli/linux-x64-gnu": "3.31.0",
     "@fallow-cli/linux-arm64-gnu": "3.33.1",
