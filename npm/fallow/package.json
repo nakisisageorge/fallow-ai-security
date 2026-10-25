@@ -91,7 +91,7 @@
   "optionalDependencies": {
     "@fallow-cli/darwin-arm64": "3.33.1",
     "@fallow-cli/darwin-x64": "3.31.0",
-    "@fallow-cli/linux-x64-gnu": "3.31.0",
+    "@fallow-cli/linux-x64-gnu": "3.34.1",
     "@fallow-cli/linux-arm64-gnu": "3.34.1",
     "@fallow-cli/linux-x64-musl": "3.31.0",
     "@fallow-cli/linux-arm64-musl": "3.34.1",
