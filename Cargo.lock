@@ -1292,7 +1292,7 @@ dependencies = [
  "sha2 0.11.0",
  "signal-hook",
  "similar 3.2.0",
- "srcmap-sourcemap",
+ "srcmap-sourcemap 0.4.0",
  "syn 3.0.9",
  "tempfile",
  "toml",
@@ -1428,7 +1428,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2 0.11.0",
- "srcmap-sourcemap",
+ "srcmap-sourcemap 0.4.0",
  "tempfile",
  "toml",
  "tracing",
@@ -3354,7 +3354,7 @@ dependencies = [
  "oxc_coverage_types",
  "serde_json",
  "srcmap-remapping",
- "srcmap-sourcemap",
+ "srcmap-sourcemap 0.3.9",
 ]
 
 [[package]]
@@ -4877,15 +4877,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "srcmap-codec"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cae7e00ed3a2a08f47e8265db91cf082c759d2e78d8328414208c02340950f14"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
 name = "srcmap-generator"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ceb9043924adb7a987cbe5cf467a93463c8dcb177e97c169d78f586d66fd8191"
 dependencies = [
  "rustc-hash",
- "srcmap-codec",
- "srcmap-scopes",
- "srcmap-sourcemap",
+ "srcmap-codec 0.3.9",
+ "srcmap-scopes 0.3.9",
+ "srcmap-sourcemap 0.3.9",
 ]
 
 [[package]]
@@ -4895,7 +4904,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7323b4eaf9a05921a6de1a0b231fb792aa76429f3a0e0c80d94858681abd452a"
 dependencies = [
  "srcmap-generator",
- "srcmap-sourcemap",
+ "srcmap-sourcemap 0.3.9",
 ]
 
 [[package]]
@@ -4904,7 +4913,16 @@ version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3cdfe41caa18fc53ab7ffe9d43deb3d0e3e5f18e8f72b543458c6aab3ac7a7bf"
 dependencies = [
- "srcmap-codec",
+ "srcmap-codec 0.3.9",
+]
+
+[[package]]
+name = "srcmap-scopes"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "22a332e089bd164c5a0cc21182ffd98a9051f59b771f21c26c0d4e63a432e739"
+dependencies = [
+ "srcmap-codec 0.4.0",
 ]
 
 [[package]]
@@ -4916,8 +4934,22 @@ dependencies = [
  "memchr",
  "serde",
  "serde_json",
- "srcmap-codec",
- "srcmap-scopes",
+ "srcmap-codec 0.3.9",
+ "srcmap-scopes 0.3.9",
+]
+
+[[package]]
+name = "srcmap-sourcemap"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e7081eae3039de3ddeb2f0ad5ee05a39c5c973346f0d580fdef7d32007a4786"
+dependencies = [
+ "memchr",
+ "serde",
+ "serde_json",
+ "srcmap-codec 0.4.0",
+ "srcmap-scopes 0.4.0",
+ "url",
 ]
 
 [[package]]
