@@ -58,7 +58,7 @@ fallow-process = { workspace = true }
 fallow-security = { workspace = true }
 fallow-types = { workspace = true }
 fallow-v8-coverage = { version = "3.31.0", path = "../v8-coverage" }
-fallow-cov-protocol = "0.8"
+fallow-cov-protocol = "0.9"
 fallow-license = { version = "3.31.0", path = "../license" }
 ed25519-dalek = { version = "2", default-features = false, features = ["std"] }
 clap = { workspace = true }
@@ -122,7 +122,7 @@ proc-macro2 = { version = "1", features = ["span-locations"] }
 syn = { version = "3", features = ["full"] }
 base64 = "0.23"
 ed25519-dalek = { version = "2", default-features = false, features = ["std"] }
-fallow-cov-protocol = "0.8"
+fallow-cov-protocol = "0.9"
 
 [package.metadata.cargo-shear]
 ignored = [
